@@ -1,0 +1,28 @@
+.list-group-item {
+    position: relative;
+    display: block;
+    padding: 0 15px;
+    margin-bottom: -1px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    display: flex;
+    align-items: center;
+}
+.list-group-item:hover {
+    background: #357ebd;
+    color: white;
+}
+.list-group-item .link-room:hover {
+    color: white;
+}
+.link-room {
+    width: 100%;
+    display: block;
+    height: 100%;
+    padding: 10px 0;
+}
+.delete-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+}

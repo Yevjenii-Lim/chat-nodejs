@@ -40,11 +40,11 @@ const ChangePassword = ({ username }) => {
         onChange={(e) => setNewPassword(e.target.value)}
       ></input>
       <button
-        className="btn btn-lg btn-primary btn-block"
+        className="btn-blue"
         type="submit"
         onClick={changePassword}
       >
-        Register
+        Change password
       </button>
     </form>
   );

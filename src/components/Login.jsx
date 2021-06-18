@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
-
-const Login = ({ setLogin, login, setUser }) => {
+import "./register.css";
+import "./login.css"
+import Greeting from "./Greeting";
+const Login = ({ setLogin, login, setUser, userNameState }) => {
   let [username, setUsername] = useState("");
   let [password, setPassword] = useState("");
 
@@ -22,12 +24,14 @@ const Login = ({ setLogin, login, setUser }) => {
       console.log("got token", result.data);
       localStorage.setItem("token", result.data);
       setUser(username)
+      setUsername("")
+      setPassword("")
       alert("you log in");
     } else {
       alert(result.message);
     }
   }
-  let links = login ? <NavLink to="change-password"> Change password for {username} </NavLink> : null
+  let links = login ? <NavLink className="btn-blue"  to="change-password"> Change password for {username} </NavLink> : null
   return (
       <div>
 
@@ -60,16 +64,16 @@ const Login = ({ setLogin, login, setUser }) => {
           Remember me
         </input>
       </label> */}
-      <button
-        className="btn btn-lg btn-primary btn-block"
+      {!login ?<button
+        className=" btn-blue "
         type="submit"
         onClick={loginUser}
       >
         Login
-      </button>
+      </button> : null}
+      {login ? <Greeting username={userNameState}></Greeting> : null}
+ 
     </form>
-    {links}
-    {login ? <NavLink to="/rooms">To chat rooms</NavLink> : null}
     </div>
 
   );

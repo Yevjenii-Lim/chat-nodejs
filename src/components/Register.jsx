@@ -2,12 +2,16 @@ import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
 import "./register.css";
 
-const Register = ({setLogin, setUser, login}) => {
+const Register = ({ setLogin, setUser, login }) => {
   let [username, setUsername] = useState("");
   let [password, setPassword] = useState("");
 
   async function registerUser(event) {
     event.preventDefault();
+    if(username.length === 0 && password.length === 0) {
+        alert("please fill the fields")
+        return
+    }
     let result = await fetch("http://localhost:3000/api/register", {
       method: "POST",
       headers: {
@@ -19,9 +23,9 @@ const Register = ({setLogin, setUser, login}) => {
       }),
     }).then((res) => res.json());
     if (result.status === "ok") {
-        setLogin(true)
-        alert(result.message)
-        setUser(username)
+      setLogin(true);
+      alert(result.message);
+      setUser(username);
     } else {
       alert(result.message);
     }
@@ -53,22 +57,16 @@ const Register = ({setLogin, setUser, login}) => {
           onChange={(e) => setPassword(e.target.value)}
         ></input>
         <button
-          className="btn btn-lg btn-primary btn-block"
+          className="btn-blue "
           type="submit"
           onClick={registerUser}
         >
-          Register
+          Register account
         </button>
+        <p className="separate">or</p>
+        <NavLink className="btn-blue" to="/login">Login</NavLink>{" "}
+        <p>{login ? <NavLink className="btn-blue" to="/rooms">To chat rooms</NavLink> : null}</p>
       </form>
-      <div>
-          <p>Or</p>
-<NavLink to="/login">
-Login
-</NavLink> <p>
-
-          {login ? <NavLink to="/rooms">To chat rooms</NavLink> : null}
-</p>
-      </div>
     </div>
   );
 };

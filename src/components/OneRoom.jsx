@@ -121,6 +121,7 @@ function OneRoom({ username }) {
                 className="form-control"
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
+                autoComplete="off"
               ></input>
             </div>
           </div>

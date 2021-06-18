@@ -28,7 +28,7 @@ function App() {
           ></Register>{" "}
         </Route>
         <Route exact path="/login">
-          <Login setLogin={setLogin} login={login} setUser={setUser}></Login>
+          <Login setLogin={setLogin} login={login} setUser={setUser} userNameState={username}></Login>
         </Route>
         <Route exact path="/change-password">
             <ChangePassword username={username}></ChangePassword>

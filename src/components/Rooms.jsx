@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { NavLink, Redirect } from "react-router-dom";
-import socket from './socket'
+import socket from './socket';
+import './rooms-style.css'
+import Delete from "./Delete";
 
 
 const Rooms = ({username}) => {
@@ -30,6 +32,10 @@ const Rooms = ({username}) => {
 
   async function postRoom(event) {
     event.preventDefault();
+    if(roomTitle.length === 0) {
+        alert("fill the title")
+        return
+    } 
     let result = await fetch("http://localhost:3000/api/rooms", {
       method: "POST",
       headers: {
@@ -50,6 +56,9 @@ const Rooms = ({username}) => {
 
   let deleteRoom = async (title) => {
     // event.preventDefault();
+    if(!window.confirm(`are you sure you want to delete ${title} room?`)) {
+        return
+    }
     let result = await fetch("http://localhost:3000/api/rooms", {
       method: "DELETE",
       headers: {
@@ -84,6 +93,7 @@ const Rooms = ({username}) => {
               type="text"
               className="form-control"
               value={roomTitle}
+              autoComplete="off"
               onChange={(e) => setRoomTitle(e.target.value)}
             ></input>
           </div>
@@ -91,14 +101,17 @@ const Rooms = ({username}) => {
       </div>
       <h1>Available rooms</h1>
       <div className="list-group">
-        {rooms.map((i, index) => (
-          <p key={index}>
-            <NavLink exact to={`rooms/${i}`}>
+          <div>
+          {rooms.map((i, index) => (
+          <span className='list-group-item'>
+            <NavLink key={index} className="link-room" exact to={`rooms/${i}`}>
               {i}
             </NavLink>
-            <button onClick={() => deleteRoom(i)}>delete</button>
-          </p>
+            <button className="delete-btn" onClick={() => deleteRoom(i)}><Delete></Delete></button>
+          </span>
         ))}
+          </div>
+      
       </div>
     </div>
   );
