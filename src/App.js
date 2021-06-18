@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { BrowserRouter, Route } from "react-router-dom";
 import "./App.css";
 import ChangePassword from "./components/ChangePassword";
@@ -11,6 +11,10 @@ import socket from './components/socket'
 function App() {
   let [login, setLogin] = useState(false);
   let [username, setUser] = useState("");
+
+  useEffect(() => {
+    console.log(localStorage.getItem("token"))
+  })
 
   return (
     <BrowserRouter>

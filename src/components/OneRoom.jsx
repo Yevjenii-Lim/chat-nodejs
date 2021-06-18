@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useRouteMatch } from "react-router";
+import { Redirect, useRouteMatch } from "react-router";
 import "./messags.css";
 import socket from "./socket";
 
@@ -7,11 +7,13 @@ function OneRoom({ username }) {
   const router = useRouteMatch();
   let [messags, setMessages] = useState([]);
   let [message, setMessage] = useState("");
-  let [triger, setTriger] = useState(true);
+//   let [triger, setTriger] = useState(true);
   let room = useRouteMatch().params.room;
 
+
   useEffect(() => {
-    // socket.emit("chatmessage", {author: username, msg:  message, room: room})
+   
+    socket.emit("connection")
     async function getMessages() {
       let result = await fetch("http://localhost:3000/api/rooms/" + room, {
         method: "GET",
@@ -27,24 +29,51 @@ function OneRoom({ username }) {
       }
     }
     getMessages();
-  }, [room, triger]);
+  }, [room]);
 
-//   useEffect(() => {
-//     socket.on("output-messages", function (data) {
-//      //   let refres = [...messags];
-//        // refres.push(data)
-//         setMessages(data)
+  useEffect(() => {
+      
+    // socket.emit("chatmessage", { author: username, msg: message, room: room }, ({status}) => {
+    //     console.log(status)
+    // });
+    socket.emit("chatmessage", { author: username, msg: "test", room: room })
+    console.log("userefec")
+    return () => {
+        socket.emit("disconect")
+        socket.off()
+    }
+  }, []);
 
-//     });
-//   }, []);
-  socket.on("message", function (data) {
-      console.log(data)
-    // setMessages(data.data)
+  useEffect(() => {
+   
+    socket.on("message", (message) => {
+        console.log(message)
+        // console.log(message)
+        if(message.room != room) {
+            console.log('wrong room')
+        }else {
 
-});
+            setMessages([...messags, message])
+        }
+        // setMessages(message.text)
+    })
+  }, [messags])
+
+
   async function sendMessage(event) {
     event.preventDefault();
-    socket.emit("chatmessage", { author: username, msg: message, room: room });
+
+    if(message) {
+        console.log("send")
+        socket.emit("chatmessage", { author: username, msg: message, room: room }, (error) => {
+            if(error) {
+                console.log(error)
+
+            }
+        }); 
+        setMessage("")
+    }
+
     // if(username.length === 0) {
     //     console.log("no user")
     //     return
@@ -66,6 +95,9 @@ function OneRoom({ username }) {
     // } else {
     //   alert(result.message);
     // }
+  }
+  if (!!username === false) {
+    return <Redirect to="/" />;
   }
   return (
     <div>
@@ -116,6 +148,7 @@ let Message = ({ author, text }) => {
     <div className="message">
       <p>Author: {author}</p>
       <p>Message: {text}</p>
+    
     </div>
   );
 };

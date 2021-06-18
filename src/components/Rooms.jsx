@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, Redirect } from "react-router-dom";
 import socket from './socket'
 
 
@@ -7,6 +7,8 @@ const Rooms = ({username}) => {
   let [rooms, setRooms] = useState([]);
   let [triger, setTriger] = useState(true)
   let [roomTitle, setRoomTitle] = useState("");
+
+ 
 
   useEffect(() => {
       socket.emit("ROOMS", {test: username})
@@ -46,6 +48,28 @@ const Rooms = ({username}) => {
     }
   }
 
+  let deleteRoom = async (title) => {
+    // event.preventDefault();
+    let result = await fetch("http://localhost:3000/api/rooms", {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        title: title
+      }),
+    }).then((res) => res.json());
+    if (result.status === "ok") {
+        console.log(result.status)
+        setTriger(!triger)
+    } else {
+      alert(result.message);
+    }
+  }
+  if (!!username === false) {
+    return <Redirect to="/" />;
+  }
+
   return (
     <div className="block-panel">
       <div className="row">
@@ -72,6 +96,7 @@ const Rooms = ({username}) => {
             <NavLink exact to={`rooms/${i}`}>
               {i}
             </NavLink>
+            <button onClick={() => deleteRoom(i)}>delete</button>
           </p>
         ))}
       </div>
