@@ -3,7 +3,7 @@ import { NavLink, Redirect } from "react-router-dom";
 import socket from './socket';
 import './rooms-style.css'
 import Delete from "./Delete";
-
+import { conditionalExpression } from "@babel/types";
 
 const Rooms = ({username}) => {
   let [rooms, setRooms] = useState([]);
@@ -13,8 +13,9 @@ const Rooms = ({username}) => {
  
 
   useEffect(() => {
-      socket.emit("ROOMS", {test: username})
-    async function getRooms(event) {
+      
+    async function getRooms() {
+
       let result = await fetch("http://localhost:3000/api/rooms", {
         method: "GET",
         headers: {
@@ -27,6 +28,8 @@ const Rooms = ({username}) => {
         console.log(result.message);
       }
     }
+
+    console.log('get reques')
     getRooms();
   }, [triger]);
 
@@ -36,44 +39,71 @@ const Rooms = ({username}) => {
         alert("fill the title")
         return
     } 
-    let result = await fetch("http://localhost:3000/api/rooms", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        title: roomTitle
-      }),
-    }).then((res) => res.json());
-    if (result.status === "ok") {
-        console.log(result.status)
-        setTriger(!triger)
-        setRoomTitle("")
-    } else {
-      alert(result.message);
-    }
+
+    socket.emit("addRoom", {title: roomTitle}, (error) => {
+        if (error) {
+          console.log(error);
+        }
+    })
+    
+    setRoomTitle("")
+    // let result = await fetch("http://localhost:3000/api/rooms", {
+    //   method: "POST",
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //   },
+    //   body: JSON.stringify({
+    //     title: roomTitle
+    //   }),
+    // }).then((res) => res.json());
+    // if (result.status === "ok") {
+    //     console.log(result.status)
+    //     setTriger(!triger)
+    //     setRoomTitle("")
+    // } else {
+    //   alert(result.message);
+    // }
   }
+  useEffect(() => {
+    socket.emit("addRoom", {title: "test"})
+    socket.on("RoomAded", (room) => {
+        console.log('on socket')
+        setTriger(room)
+        // setRooms([...rooms, room]);
+    })
+    socket.on("roomDeleted", (room) => {
+        setTriger(room)
+    })
+    socket.on("roomExist", message => {
+        console.log(message.message)
+    })
+  
+  }, [])
+
 
   let deleteRoom = async (title) => {
     // event.preventDefault();
-    if(!window.confirm(`are you sure you want to delete ${title} room?`)) {
-        return
-    }
-    let result = await fetch("http://localhost:3000/api/rooms", {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        title: title
-      }),
-    }).then((res) => res.json());
-    if (result.status === "ok") {
-        console.log(result.status)
-        setTriger(!triger)
-    } else {
-      alert(result.message);
-    }
+
+
+    socket.emit("deleteRoom", {title: title})
+    // if(!window.confirm(`are you sure you want to delete ${title} room?`)) {
+    //     return
+    // }
+    // let result = await fetch("http://localhost:3000/api/rooms", {
+    //   method: "DELETE",
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //   },
+    //   body: JSON.stringify({
+    //     title: title
+    //   }),
+    // }).then((res) => res.json());
+    // if (result.status === "ok") {
+    //     console.log(result.status)
+    //     setTriger(!triger)
+    // } else {
+    //   alert(result.message);
+    // }
   }
   if (!!username === false) {
     return <Redirect to="/" />;
@@ -103,8 +133,8 @@ const Rooms = ({username}) => {
       <div className="list-group">
           <div>
           {rooms.map((i, index) => (
-          <span className='list-group-item'>
-            <NavLink key={index} className="link-room" exact to={`rooms/${i}`}>
+          <span className='list-group-item' key={index}>
+            <NavLink  className="link-room" exact to={`rooms/${i}`}>
               {i}
             </NavLink>
             <button className="delete-btn" onClick={() => deleteRoom(i)}><Delete></Delete></button>
